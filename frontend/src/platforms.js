@@ -1,6 +1,7 @@
 import logoNetflix from './assets/logos/logo-netflix.png'
 import logoApple from './assets/logos/logo-apple-tv.png'
 import logoAmazon from './assets/logos/prime-video.png'
+import logoDisney from './assets/logos/disney-plus.svg?url'
 import logoParamount from './assets/logos/paramount-plus.png'
 import logoMax from './assets/logos/hbo-max.png'
 import logoCinema from './assets/logos/cinema.png'
@@ -13,6 +14,8 @@ export const TEMPLATE_PLATFORM = {
   'apple-series': 'apple',
   'amazon-movies': 'amazon',
   'amazon-series': 'amazon',
+  'disney-movies': 'disney',
+  'disney-series': 'disney',
   'paramount-series': 'paramount',
   'hbo-series': 'max',
   cinema: 'cinema',
@@ -42,6 +45,14 @@ export const PLATFORMS = [
     colorHex: '#00A8E1',
     logo: logoAmazon,
     anchor: 'amazon',
+  },
+  {
+    id: 'disney',
+    label: 'Disney+',
+    color: 'var(--platform-disney)',
+    colorHex: '#113CCF',
+    logo: logoDisney,
+    anchor: 'disney',
   },
   {
     id: 'paramount',
