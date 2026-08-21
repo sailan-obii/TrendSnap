@@ -114,3 +114,12 @@ export function isoDaysAgo(days) {
     const dd = String(d.getUTCDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
 }
+
+export function isoYearsAgo(years) {
+    const d = new Date();
+    d.setUTCFullYear(d.getUTCFullYear() - years);
+    const yyyy = d.getUTCFullYear();
+    const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(d.getUTCDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}

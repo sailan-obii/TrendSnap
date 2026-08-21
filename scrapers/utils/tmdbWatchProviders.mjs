@@ -9,6 +9,7 @@ import {
     REGION,
     tmdbFetch,
     isoDaysAgo,
+    isoYearsAgo,
 } from './tmdb.mjs';
 
 export const TOP_N = 10;
@@ -17,6 +18,8 @@ export const TOP_N = 10;
 export const NOUVEAUTES_MOVIE_DAYS = 730;
 /** Fenêtre « nouveautés » séries : épisodes / saisons diffusés récemment. */
 export const NOUVEAUTES_TV_DAYS = 365;
+/** Exclut les séries dont la saison 1 a plus de N années (ex. Les Simpson). */
+export const NOUVEAUTES_TV_MAX_FIRST_AIR_YEARS = 5;
 
 /** IDs TMDB watch providers (région FR). */
 export const PROVIDER_IDS = {
@@ -28,36 +31,61 @@ export const PROVIDER_IDS = {
     disneyPlus: 337,
 };
 
-async function discoverPopularByProvider(auth, pathname, providerId, { topN = TOP_N, extraParams = {} } = {}) {
-    const data = await tmdbFetch(pathname, auth, {
-        language: LANGUAGE,
-        watch_region: REGION,
-        with_watch_providers: String(providerId),
-        with_watch_monetization_types: 'flatrate',
-        sort_by: 'popularity.desc',
-        include_adult: false,
-        page: 1,
-        ...extraParams,
-    });
+async function discoverPopularByProvider(
+    auth,
+    pathname,
+    providerId,
+    { topN = TOP_N, extraParams = {}, maxPages = 1, keepItem } = {}
+) {
+    const kept = [];
 
-    return (data.results ?? []).slice(0, topN);
+    for (let page = 1; page <= maxPages && kept.length < topN; page++) {
+        const data = await tmdbFetch(pathname, auth, {
+            language: LANGUAGE,
+            watch_region: REGION,
+            with_watch_providers: String(providerId),
+            with_watch_monetization_types: 'flatrate',
+            sort_by: 'popularity.desc',
+            include_adult: false,
+            page,
+            ...extraParams,
+        });
+
+        const results = data.results ?? [];
+        if (results.length === 0) break;
+
+        for (const item of results) {
+            if (keepItem && !keepItem(item)) continue;
+            kept.push(item);
+            if (kept.length >= topN) break;
+        }
+
+        if (page >= (data.total_pages ?? 1)) break;
+    }
+
+    return kept;
+}
+
+function isFirstAirDateRecentEnough(item, minIsoDate) {
+    const firstAir = item.first_air_date || '';
+    if (!/^\d{4}-\d{2}-\d{2}/.test(firstAir)) return false;
+    return firstAir.slice(0, 10) >= minIsoDate;
 }
 
 function recencyParams(mediaType, recencyDays) {
     if (!recencyDays) return {};
 
-    const from = isoDaysAgo(recencyDays);
     const to = isoDaysAgo(0);
 
     if (mediaType === 'movie') {
         return {
-            'primary_release_date.gte': from,
+            'primary_release_date.gte': isoDaysAgo(recencyDays),
             'primary_release_date.lte': to,
         };
     }
 
     return {
-        'air_date.gte': from,
+        'air_date.gte': isoDaysAgo(recencyDays),
         'air_date.lte': to,
     };
 }
@@ -187,7 +215,14 @@ function fallbackMovie(listItem, rank) {
     };
 }
 
-async function runTmdbProviderJob({ providerId, snapshotFile, label, mediaType, recencyDays }) {
+async function runTmdbProviderJob({
+    providerId,
+    snapshotFile,
+    label,
+    mediaType,
+    recencyDays,
+    maxFirstAirAgeYears,
+}) {
     loadEnvFile();
     const auth = getAuth();
     const isMovie = mediaType === 'movie';
@@ -196,6 +231,11 @@ async function runTmdbProviderJob({ providerId, snapshotFile, label, mediaType, 
     const enrich = isMovie ? enrichMovie : enrichTvShow;
     const fallback = isMovie ? fallbackMovie : fallbackTvShow;
     const extraParams = recencyParams(mediaType, recencyDays);
+    const minFirstAirDate = maxFirstAirAgeYears ? isoYearsAgo(maxFirstAirAgeYears) : null;
+    const keepItem =
+        !isMovie && minFirstAirDate
+            ? (item) => isFirstAirDateRecentEnough(item, minFirstAirDate)
+            : undefined;
 
     try {
         console.log(`TMDB Discover ${kind} ${label} (provider ${providerId}, ${REGION})...`);
@@ -204,15 +244,24 @@ async function runTmdbProviderJob({ providerId, snapshotFile, label, mediaType, 
             const to = extraParams['primary_release_date.lte'] || extraParams['air_date.lte'];
             console.log(`Filtre nouveautés : ${from} → ${to} (${recencyDays} jours)`);
         }
+        if (minFirstAirDate) {
+            console.log(
+                `Filtre saison 1 : first_air_date ≥ ${minFirstAirDate} (max ${maxFirstAirAgeYears} ans)`
+            );
+        }
 
-        const results = await discover(auth, providerId, { extraParams });
+        const results = await discover(auth, providerId, {
+            extraParams,
+            maxPages: minFirstAirDate ? 5 : 1,
+            keepItem,
+        });
 
         if (results.length === 0) {
             throw new Error(`Aucun résultat TMDB Discover pour ${label} (${kind}).`);
         }
 
-        if (recencyDays && results.length < TOP_N) {
-            console.warn(`Seulement ${results.length} ${kind} après filtre nouveautés pour ${label}.`);
+        if ((recencyDays || maxFirstAirAgeYears) && results.length < TOP_N) {
+            console.warn(`Seulement ${results.length} ${kind} après filtres nouveautés pour ${label}.`);
         }
 
         console.log(`TMDB ${label} : ${results.length} ${kind}`);
@@ -244,6 +293,7 @@ async function runTmdbProviderJob({ providerId, snapshotFile, label, mediaType, 
  * @param {string} config.snapshotFile
  * @param {string} config.label
  * @param {number} [config.recencyDays] - Si défini, limite aux titres récents (nouveautés).
+ * @param {number} [config.maxFirstAirAgeYears] - Séries : ignore si la saison 1 a plus de N années.
  */
 export async function runTmdbProviderSeriesJob(config) {
     return runTmdbProviderJob({ ...config, mediaType: 'tv' });
