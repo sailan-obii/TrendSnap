@@ -1,7 +1,14 @@
-import { PROVIDER_IDS, runTmdbProviderSeriesJob } from '../utils/tmdbWatchProviders.mjs';
+import {
+    NOUVEAUTES_TV_DAYS,
+    NOUVEAUTES_TV_MAX_FIRST_AIR_YEARS,
+    PROVIDER_IDS,
+    runTmdbProviderSeriesJob,
+} from '../utils/tmdbWatchProviders.mjs';
 
 runTmdbProviderSeriesJob({
     providerId: PROVIDER_IDS.paramountPlus,
     snapshotFile: 'paramount-series.json',
     label: 'Paramount+',
+    recencyDays: NOUVEAUTES_TV_DAYS,
+    maxFirstAirAgeYears: NOUVEAUTES_TV_MAX_FIRST_AIR_YEARS,
 });
