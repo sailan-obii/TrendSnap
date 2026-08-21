@@ -8,9 +8,15 @@ import {
     backdropUrl,
     REGION,
     tmdbFetch,
+    isoDaysAgo,
 } from './tmdb.mjs';
 
 export const TOP_N = 10;
+
+/** Fenêtre « nouveautés » films (chrono FR : sortie salles → SVOD). */
+export const NOUVEAUTES_MOVIE_DAYS = 730;
+/** Fenêtre « nouveautés » séries : épisodes / saisons diffusés récemment. */
+export const NOUVEAUTES_TV_DAYS = 365;
 
 /** IDs TMDB watch providers (région FR). */
 export const PROVIDER_IDS = {
@@ -22,7 +28,7 @@ export const PROVIDER_IDS = {
     disneyPlus: 337,
 };
 
-async function discoverPopularByProvider(auth, pathname, providerId, { topN = TOP_N } = {}) {
+async function discoverPopularByProvider(auth, pathname, providerId, { topN = TOP_N, extraParams = {} } = {}) {
     const data = await tmdbFetch(pathname, auth, {
         language: LANGUAGE,
         watch_region: REGION,
@@ -31,9 +37,29 @@ async function discoverPopularByProvider(auth, pathname, providerId, { topN = TO
         sort_by: 'popularity.desc',
         include_adult: false,
         page: 1,
+        ...extraParams,
     });
 
     return (data.results ?? []).slice(0, topN);
+}
+
+function recencyParams(mediaType, recencyDays) {
+    if (!recencyDays) return {};
+
+    const from = isoDaysAgo(recencyDays);
+    const to = isoDaysAgo(0);
+
+    if (mediaType === 'movie') {
+        return {
+            'primary_release_date.gte': from,
+            'primary_release_date.lte': to,
+        };
+    }
+
+    return {
+        'air_date.gte': from,
+        'air_date.lte': to,
+    };
 }
 
 /**
@@ -161,7 +187,7 @@ function fallbackMovie(listItem, rank) {
     };
 }
 
-async function runTmdbProviderJob({ providerId, snapshotFile, label, mediaType }) {
+async function runTmdbProviderJob({ providerId, snapshotFile, label, mediaType, recencyDays }) {
     loadEnvFile();
     const auth = getAuth();
     const isMovie = mediaType === 'movie';
@@ -169,13 +195,24 @@ async function runTmdbProviderJob({ providerId, snapshotFile, label, mediaType }
     const discover = isMovie ? discoverPopularMoviesByProvider : discoverPopularTvByProvider;
     const enrich = isMovie ? enrichMovie : enrichTvShow;
     const fallback = isMovie ? fallbackMovie : fallbackTvShow;
+    const extraParams = recencyParams(mediaType, recencyDays);
 
     try {
         console.log(`TMDB Discover ${kind} ${label} (provider ${providerId}, ${REGION})...`);
-        const results = await discover(auth, providerId);
+        if (recencyDays) {
+            const from = extraParams['primary_release_date.gte'] || extraParams['air_date.gte'];
+            const to = extraParams['primary_release_date.lte'] || extraParams['air_date.lte'];
+            console.log(`Filtre nouveautés : ${from} → ${to} (${recencyDays} jours)`);
+        }
+
+        const results = await discover(auth, providerId, { extraParams });
 
         if (results.length === 0) {
             throw new Error(`Aucun résultat TMDB Discover pour ${label} (${kind}).`);
+        }
+
+        if (recencyDays && results.length < TOP_N) {
+            console.warn(`Seulement ${results.length} ${kind} après filtre nouveautés pour ${label}.`);
         }
 
         console.log(`TMDB ${label} : ${results.length} ${kind}`);
@@ -206,6 +243,7 @@ async function runTmdbProviderJob({ providerId, snapshotFile, label, mediaType }
  * @param {number} config.providerId - ID watch provider TMDB
  * @param {string} config.snapshotFile
  * @param {string} config.label
+ * @param {number} [config.recencyDays] - Si défini, limite aux titres récents (nouveautés).
  */
 export async function runTmdbProviderSeriesJob(config) {
     return runTmdbProviderJob({ ...config, mediaType: 'tv' });
@@ -216,6 +254,7 @@ export async function runTmdbProviderSeriesJob(config) {
  * @param {number} config.providerId - ID watch provider TMDB
  * @param {string} config.snapshotFile
  * @param {string} config.label
+ * @param {number} [config.recencyDays] - Si défini, limite aux titres récents (nouveautés).
  */
 export async function runTmdbProviderMoviesJob(config) {
     return runTmdbProviderJob({ ...config, mediaType: 'movie' });

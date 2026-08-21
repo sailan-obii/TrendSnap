@@ -120,7 +120,7 @@ export function TrendsPage() {
         <section id="disney" className="media-section scroll-mt-[calc(var(--header-height)+1rem)] lg:scroll-mt-4">
           <PlatformSection
             platformId="disney"
-            title="Top 10 films populaires"
+            title="Top 10 nouveautés films"
             snapshot={disneyMovies}
             template="disney-movies"
             onMovieSelect={handleMovieSelect}
@@ -129,7 +129,7 @@ export function TrendsPage() {
         <section id="disney" className="media-section scroll-mt-[calc(var(--header-height)+1rem)] lg:scroll-mt-4">
           <PlatformSection
             platformId="disney"
-            title="Top 10 séries populaires"
+            title="Top 10 nouveautés séries"
             snapshot={disneySeries}
             template="disney-series"
             onMovieSelect={handleMovieSelect}
