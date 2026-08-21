@@ -13,6 +13,8 @@ const appleSeries = loadSnapshot('apple-series.json')
 const appleMovies = loadSnapshot('apple-movies.json')
 const amazonSeries = loadSnapshot('amazon-series.json')
 const amazonMovies = loadSnapshot('amazon-movies.json')
+const disneySeries = loadSnapshot('disney-series.json')
+const disneyMovies = loadSnapshot('disney-movies.json')
 const paramountSeries = loadSnapshot('paramount-series.json')
 const hboSeries = loadSnapshot('hbo-series.json')
 const heroSnapshot = loadSnapshot('hero-slides.json')
@@ -111,6 +113,25 @@ export function TrendsPage() {
             title="Top 10 nouveautés films"
             snapshot={amazonMovies}
             template="amazon-movies"
+            onMovieSelect={handleMovieSelect}
+          />
+        </section>
+
+        <section id="disney" className="media-section scroll-mt-[calc(var(--header-height)+1rem)] lg:scroll-mt-4">
+          <PlatformSection
+            platformId="disney"
+            title="Top 10 nouveautés films"
+            snapshot={disneyMovies}
+            template="disney-movies"
+            onMovieSelect={handleMovieSelect}
+          />
+        </section>
+        <section id="disney" className="media-section scroll-mt-[calc(var(--header-height)+1rem)] lg:scroll-mt-4">
+          <PlatformSection
+            platformId="disney"
+            title="Top 10 nouveautés séries"
+            snapshot={disneySeries}
+            template="disney-series"
             onMovieSelect={handleMovieSelect}
           />
         </section>

@@ -13,7 +13,9 @@ export const CARD_TEMPLATES = {
   'apple-series': appleSeries,
   'apple-movies': appleMovies,
   'amazon-series': amazonSeries,
-  'amazon-movies': amazonMovies
+  'amazon-movies': amazonMovies,
+  'disney-series': cinema,
+  'disney-movies': cinema,
 }
 
 export function getCardTemplate(name) {
