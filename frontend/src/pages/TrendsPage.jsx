@@ -139,7 +139,7 @@ export function TrendsPage() {
         <section id="paramount" className="media-section scroll-mt-[calc(var(--header-height)+1rem)] lg:scroll-mt-4">
           <PlatformSection
             platformId="paramount"
-            title="Top 10 séries populaires"
+            title="Top 10 nouveautés séries"
             snapshot={paramountSeries}
             template="paramount-series"
             onMovieSelect={handleMovieSelect}
@@ -148,7 +148,7 @@ export function TrendsPage() {
         <section id="hbo-max" className="media-section scroll-mt-[calc(var(--header-height)+1rem)] lg:scroll-mt-4">
           <PlatformSection
             platformId="max"
-            title="Top 10 séries populaires"
+            title="Top 10 nouveautés séries"
             snapshot={hboSeries}
             template="hbo-series"
             onMovieSelect={handleMovieSelect}
