@@ -1,6 +1,6 @@
 export const config = {
-  cardWidth: 182,
-  cardHeight: 273,
+  cardWidth: 210,
+  cardHeight: 300,
   cardBorderClass: 'border-2 border-zinc-500/50',
   posterAspect: '2/3',
   showNumber: true,

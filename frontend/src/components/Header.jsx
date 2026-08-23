@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { AppSidebar } from './AppSidebar'
+import { AppSidebar, SidebarFavoritesLink } from './AppSidebar'
 import trendSnapLogo from '../assets/TrendSnap-logo1.png'
 
 function BrandLogo({ className = 'text-xl' }) {
@@ -65,12 +65,15 @@ export function Header() {
       </header>
 
       {/* Sidebar desktop */}
-      <aside className="fixed top-0 bottom-0 left-0 z-50 hidden w-[var(--sidebar-width)] flex-col border-r border-white/10 bg-[var(--bg-sidebar)] pt-6 lg:flex">
+      <aside className="fixed top-0 bottom-0 left-0 z-50 hidden w-[var(--sidebar-width)] flex-col overflow-hidden border-r border-white/10 bg-[var(--bg-sidebar)] pt-6 lg:flex">
         <div className="shrink-0 px-4 pb-6">
           <BrandLogo />
         </div>
-        <div className="flex min-h-0 flex-1 flex-col px-0 pb-6">
+        <div className="min-h-0 flex-1 overflow-y-auto">
           <AppSidebar />
+        </div>
+        <div className="shrink-0 border-t border-white/10 px-0 py-3">
+          <SidebarFavoritesLink />
         </div>
       </aside>
 
@@ -86,8 +89,13 @@ export function Header() {
             isMenuOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <div className="flex min-h-0 flex-1 flex-col pt-16 pb-6">
-            <AppSidebar onNavigate={closeMenu} />
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden pt-16 pb-6">
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <AppSidebar onNavigate={closeMenu} />
+            </div>
+            <div className="shrink-0 border-t border-white/10 pt-3">
+              <SidebarFavoritesLink onNavigate={closeMenu} />
+            </div>
             <p className="shrink-0 px-3 pt-4 text-xs text-zinc-600">© 2026 TrendSnap</p>
           </div>
         </div>

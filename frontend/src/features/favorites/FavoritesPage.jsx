@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { BackgroundOrbs } from '../../components/BackgroundOrbs'
 import { Header } from '../../components/Header'
 import { MovieModal } from '../../components/MovieModal'
 import { useFavorites } from './useFavorites'
@@ -42,11 +43,14 @@ export function FavoritesPage() {
 
   return (
     <div className="app-main">
+      <BackgroundOrbs />
       <Header />
 
       <main className="px-6 pt-8 pb-16 max-w-7xl mx-auto">
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-fuchsia-500">Mes favoris</h1>
+          <h1 className="text-3xl font-bold text-white">
+            Mes <span className="gradient-text-violet">favoris</span>
+          </h1>
           <p className="mt-2 text-zinc-400">
             {favorites.length} / {MAX_FAVORITES} favoris enregistres
           </p>

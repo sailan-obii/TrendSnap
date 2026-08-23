@@ -153,13 +153,14 @@ export function MovieModal({
       role="presentation"
     >
       <div className="flex min-h-full items-center justify-center p-3 md:p-6">
-        <div
-          className="relative w-full max-w-4xl overflow-hidden rounded-2xl border border-white/10 bg-[var(--bg-elevated)] shadow-2xl"
-          onClick={(event) => event.stopPropagation()}
-          role="dialog"
-          aria-modal="true"
-          aria-label={title}
-        >
+        <div className="modal-flashy-border w-full max-w-4xl">
+          <div
+            className="modal-flashy-border__inner relative"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label={title}
+          >
           {isRich && (
             <div className="relative h-36 w-full md:h-52">
               <img src={resolvedBackdropUrl} alt="" className="h-full w-full object-cover" />
@@ -278,6 +279,7 @@ export function MovieModal({
                 )}
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>

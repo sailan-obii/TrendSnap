@@ -41,9 +41,18 @@ function IconBook({ className = 'w-4 h-4' }) {
   )
 }
 
-function IconHeart({ className = 'w-4 h-4' }) {
+function IconHeart({ className = 'w-4 h-4', filled = false }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M19.5 12.572l-7.5 7.428-7.5-7.428a5 5 0 1 1 7.5-6.572 5 5 0 1 1 7.5 6.572z" />
     </svg>
   )
@@ -56,21 +65,39 @@ const CATEGORY_ICONS = {
   Livres: IconBook,
 }
 
-function categoryClass({ isActive }) {
-  return isActive
-    ? 'flex items-center gap-2.5 border-l-4 border-red-500 bg-gradient-to-r from-red-500/20 via-red-500/10 to-red-500/5 px-3 py-2 text-sm text-red-400 font-semibold'
-    : 'flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-white/5 hover:text-white'
+const NAV_LINK_EMPHASIZED_CLASS =
+  'flex items-center gap-2.5 bg-gradient-to-r from-white/12 via-white/8 to-white/4 px-3 py-2 text-sm font-medium text-zinc-200 transition-colors hover:from-white/16 hover:via-white/10 hover:to-white/6 hover:text-white'
+
+function categoryClass({ isActive }, isFavoritesPage) {
+  if (isActive) {
+    return 'flex items-center gap-2.5 border-l-4 border-red-500 bg-gradient-to-r from-red-500/20 via-red-500/10 to-red-500/5 px-3 py-2 text-sm text-red-400 font-semibold'
+  }
+  if (isFavoritesPage) {
+    return NAV_LINK_EMPHASIZED_CLASS
+  }
+  return 'flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-white/5 hover:text-white'
 }
 
 function favoritesClass({ isActive }) {
   return isActive
     ? 'flex items-center gap-2.5 border-l-4 border-fuchsia-500 bg-gradient-to-r from-fuchsia-500/20 via-fuchsia-500/10 to-fuchsia-500/5 px-3 py-2 text-sm font-semibold text-fuchsia-300'
-    : 'flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-white/5 hover:text-white'
+    : NAV_LINK_EMPHASIZED_CLASS
+}
+
+export function SidebarFavoritesLink({ onNavigate }) {
+  return (
+    <NavLink to="/favoris" className={favoritesClass} onClick={() => onNavigate?.()}>
+      <IconHeart filled className="h-4 w-4 shrink-0 text-violet-500" />
+      Favoris
+    </NavLink>
+  )
 }
 
 export function AppSidebar({ onNavigate, className = '' }) {
   const navigate = useNavigate()
   const location = useLocation()
+
+  const isFavoritesPage = location.pathname === '/favoris'
 
   const handleAnchorClick = (event, anchor) => {
     event.preventDefault()
@@ -96,8 +123,8 @@ export function AppSidebar({ onNavigate, className = '' }) {
   }
 
   return (
-    <nav className={`flex min-h-0 flex-1 flex-col ${className}`}>
-      <div className="shrink-0">
+    <nav className={`flex flex-col ${className}`}>
+      <div>
         <ul className="space-y-1">
           {CATEGORY_LINKS.map((link) => {
             const Icon = CATEGORY_ICONS[link.label] ?? IconFilm
@@ -109,7 +136,12 @@ export function AppSidebar({ onNavigate, className = '' }) {
                     {link.label}
                   </span>
                 ) : (
-                  <NavLink to={link.to} end={link.to === '/'} className={categoryClass} onClick={() => onNavigate?.()}>
+                  <NavLink
+                    to={link.to}
+                    end={link.to === '/'}
+                    className={(props) => categoryClass(props, isFavoritesPage)}
+                    onClick={() => onNavigate?.()}
+                  >
                     <Icon className="h-4 w-4 shrink-0" />
                     {link.label}
                   </NavLink>
@@ -120,35 +152,30 @@ export function AppSidebar({ onNavigate, className = '' }) {
         </ul>
       </div>
 
-      <div className="mt-8 min-h-0 border-t border-b border-white/10 bg-gradient-to-b from-zinc-900/90 to-zinc-900/80 pt-3">
-        <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Plateformes</p>
-        <ul className="space-y-1 pb-3">
-          {PLATFORMS.map((platform) => (
-            <li key={platform.id}>
-              <a
-                href={`/#${platform.anchor}`}
-                onClick={(event) => handleAnchorClick(event, platform.anchor)}
-                className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/5 hover:text-white"
-              >
-                <span
-                  className="h-2 w-2 shrink-0 rounded-full"
-                  style={{ backgroundColor: platform.colorHex }}
-                  aria-hidden="true"
-                />
-                <img src={platform.logo} alt="" className="h-5 w-auto max-w-[7rem] object-contain object-left opacity-90" />
-                <span className="sr-only">{platform.label}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="shrink-0 border-t border-b border-white/10 py-3">
-        <NavLink to="/favoris" className={favoritesClass} onClick={() => onNavigate?.()}>
-          <IconHeart className="h-4 w-4 shrink-0" />
-          Favoris
-        </NavLink>
-      </div>
+      {!isFavoritesPage && (
+        <div className="mt-8 border-t border-b border-white/10 bg-gradient-to-b from-zinc-900/90 to-zinc-900/80 pt-3">
+          <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Plateformes</p>
+          <ul className="space-y-1 pb-3">
+            {PLATFORMS.map((platform) => (
+              <li key={platform.id}>
+                <a
+                  href={`/#${platform.anchor}`}
+                  onClick={(event) => handleAnchorClick(event, platform.anchor)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/5 hover:text-white"
+                >
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: platform.colorHex }}
+                    aria-hidden="true"
+                  />
+                  <img src={platform.logo} alt="" className="h-5 w-auto max-w-[7rem] object-contain object-left opacity-90" />
+                  <span className="sr-only">{platform.label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </nav>
   )
 }

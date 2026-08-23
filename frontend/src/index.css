@@ -36,7 +36,105 @@
       rgba(0, 0, 0, 0.01) 0 0 0 2px inset;
   }
 
+  .modal-flashy-border {
+    position: relative;
+    isolation: isolate;
+    padding: 1px;
+    border-radius: 1rem;
+    background: linear-gradient(
+      120deg,
+      rgba(100, 255, 218, 0.42) 0%,
+      rgba(99, 102, 241, 0.38) 22%,
+      rgba(192, 38, 211, 0.34) 44%,
+      rgba(255, 107, 107, 0.32) 66%,
+      rgba(251, 191, 36, 0.3) 88%,
+      rgba(100, 255, 218, 0.42) 100%
+    );
+    background-size: 300% 300%;
+    animation: modalBorderFlow 12s ease infinite;
+    box-shadow: 0 0 22px rgba(192, 38, 211, 0.16);
+  }
+
+  .modal-flashy-border::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    z-index: -1;
+    border-radius: 1.18rem;
+    background: inherit;
+    background-size: inherit;
+    filter: blur(8px);
+    opacity: 0.26;
+    animation: modalBorderFlow 12s ease infinite;
+  }
+
+  .modal-flashy-border__inner {
+    position: relative;
+    overflow: hidden;
+    border-radius: calc(1rem - 1px);
+    background-color: var(--bg-elevated);
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.55);
+  }
+
+  @keyframes modalBorderFlow {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .modal-flashy-border,
+    .modal-flashy-border::before {
+      animation: none;
+    }
+  }
+
+  .card-multicolor-border {
+    position: relative;
+    isolation: isolate;
+    border-radius: 0.75rem;
+    box-shadow: 0 0 12px rgba(192, 38, 211, 0.08);
+  }
+
+  .card-multicolor-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      var(--card-border-angle, 120deg),
+      var(--card-border-c1) 0%,
+      var(--card-border-c2) 34%,
+      var(--card-border-c3) 67%,
+      var(--card-border-c4) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .card-multicolor-border__inner {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    border-radius: inherit;
+  }
+
   .app-main {
+    position: relative;
+    isolation: isolate;
     min-height: 100vh;
     padding-top: var(--header-height);
     background-color: var(--bg-app);
@@ -47,12 +145,113 @@
     content: "";
     position: fixed;
     inset: 0;
-    background: 
-      radial-gradient( circle at 5% 25%, rgba(1, 194, 205, 0.15), #11090900 20% ), 
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 5% 25%, rgba(1, 194, 205, 0.15), #11090900 20%),
       radial-gradient(circle at 120% 60%, rgba(255, 0, 150, 0.11), #0000 25%),
       radial-gradient(circle at 50% 30%, rgba(60, 40, 126, 0.24), #0000 20%);
-    pointer-events: none;
+  }
+
+  .app-orbs {
+    position: fixed;
+    inset: 0;
     z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    --orb-scale: 1.5;
+  }
+
+  .app-main > main {
+    position: relative;
+    z-index: 1;
+  }
+
+  .app-orb {
+    position: absolute;
+    left: var(--orb-left);
+    top: var(--orb-top);
+    width: 0;
+    height: 0;
+  }
+
+  .app-orb--near {
+    --orbit-r: 5vw;
+  }
+
+  .app-orb--far {
+    --orbit-r: 10vw;
+  }
+
+  @media (max-width: 1023px) {
+    .app-orbs {
+      --orb-scale: 4;
+    }
+
+    .app-orb--near {
+      --orbit-r: 10vw;
+    }
+
+    .app-orb--far {
+      --orbit-r: 20vw;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .app-orb--near {
+      --orbit-r: calc((100vw - var(--sidebar-width)) * 0.05);
+    }
+
+    .app-orb--far {
+      --orbit-r: calc((100vw - var(--sidebar-width)) * 0.1);
+    }
+  }
+
+  .app-orb__blob {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(var(--orb-size) * var(--orb-scale));
+    height: calc(var(--orb-size) * var(--orb-scale));
+    border-radius: 50%;
+    background: var(--orb-color);
+    translate: -50% -50%;
+    filter: blur(calc(var(--orb-blur) * var(--orb-scale)));
+    will-change: transform;
+  }
+
+  .app-orb--cw .app-orb__blob {
+    animation: app-orb-cw var(--orb-duration) linear infinite;
+    animation-delay: var(--orb-delay);
+  }
+
+  .app-orb--ccw .app-orb__blob {
+    animation: app-orb-ccw var(--orb-duration) linear infinite;
+    animation-delay: var(--orb-delay);
+  }
+
+  @keyframes app-orb-cw {
+    from {
+      transform: rotate(0deg) translateX(var(--orbit-r)) rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg) translateX(var(--orbit-r)) rotate(-360deg);
+    }
+  }
+
+  @keyframes app-orb-ccw {
+    from {
+      transform: rotate(0deg) translateX(var(--orbit-r)) rotate(0deg);
+    }
+    to {
+      transform: rotate(-360deg) translateX(var(--orbit-r)) rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .app-orb__blob {
+      animation: none;
+    }
   }
 
   @media (min-width: 1024px) {
@@ -64,9 +263,10 @@
 
   .media-section {
     margin: 0px 0px 20px;
-    background-color: var(--bg-elevated); /* Fallback */
-    background-image: linear-gradient(60deg, #1c1c1c 0%, #181717 45%, #242424 75%, #0b0b0b 100%);
-    border: 2px solid rgb(30, 30, 30);
+    background-color: rgba(237, 237, 237, 0.1);
+    border: 2px solid rgba(227, 222, 222, 0.21);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   @media (min-width: 768px) {
@@ -99,6 +299,39 @@
     color: transparent;
     -webkit-text-stroke: 2px rgba(255, 255, 255, 0.85);
     paint-order: stroke fill;
+  }
+  .gradient-text {
+    background: linear-gradient(120deg, #64ffda 0%, #63f 25%, #ff6b6b 50%, #63f 75%, #64ffda 100%);
+    background-size: 300% 100%;
+    background-clip: border-box;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradientFlow 8s ease infinite;
+  }
+  @keyframes gradientFlow {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  .gradient-text-violet {
+    background: linear-gradient(120deg, #7c3aed 0%, #c026d3 20%, #e879f9 45%, #9333ea 65%, #7c3aed 85%, #6366f1 100%);
+    background-size: 300% 100%;
+    background-clip: border-box;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradientFlow 8s ease infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gradient-text,
+    .gradient-text-violet {
+      animation: none;
+    }
   }
   .header-gradient-border {
     position: relative;
