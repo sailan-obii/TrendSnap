@@ -1,4 +1,5 @@
 import { getFavoriteDisplayFormat } from '../favoriteNormalizer'
+import { CardMulticolorBorder } from '../../../components/CardMulticolorBorder'
 
 const ASPECT_CLASSES = {
   landscape: 'aspect-video',
@@ -12,23 +13,29 @@ export function FavoriteCard({ favorite, onOpen, onRemove }) {
 
   return (
     <article className="mb-4 break-inside-avoid group relative">
-      <button
-        type="button"
-        onClick={() => onOpen(favorite)}
-        className="block w-full overflow-hidden rounded-xl bg-zinc-900 cursor-pointer transition hover:scale-[1.02]"
+      <CardMulticolorBorder
+        seed={favorite.key}
+        className="transition hover:scale-[1.02]"
+        innerClassName="relative bg-zinc-900"
       >
-        {imageSrc && (
-          <img
-            src={imageSrc}
-            alt={content.title}
-            loading="lazy"
-            className={`w-full ${aspectClass} object-cover`}
-          />
-        )}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-3 pt-8 opacity-0 group-hover:opacity-100 transition-opacity rounded-b-xl">
-          <p className="text-sm font-medium text-white truncate">{content.title}</p>
-        </div>
-      </button>
+        <button
+          type="button"
+          onClick={() => onOpen(favorite)}
+          className="block w-full cursor-pointer"
+        >
+          {imageSrc && (
+            <img
+              src={imageSrc}
+              alt={content.title}
+              loading="lazy"
+              className={`w-full ${aspectClass} object-cover`}
+            />
+          )}
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-3 pt-8 opacity-0 group-hover:opacity-100 transition-opacity rounded-b-xl">
+            <p className="text-sm font-medium text-white truncate">{content.title}</p>
+          </div>
+        </button>
+      </CardMulticolorBorder>
 
       <button
         type="button"
