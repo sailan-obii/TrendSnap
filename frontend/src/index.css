@@ -159,6 +159,7 @@
     z-index: 0;
     overflow: hidden;
     pointer-events: none;
+    --orb-scale: 1.5;
   }
 
   .app-main > main {
@@ -182,6 +183,20 @@
     --orbit-r: 10vw;
   }
 
+  @media (max-width: 1023px) {
+    .app-orbs {
+      --orb-scale: 4;
+    }
+
+    .app-orb--near {
+      --orbit-r: 10vw;
+    }
+
+    .app-orb--far {
+      --orbit-r: 20vw;
+    }
+  }
+
   @media (min-width: 1024px) {
     .app-orb--near {
       --orbit-r: calc((100vw - var(--sidebar-width)) * 0.05);
@@ -196,12 +211,12 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: var(--orb-size);
-    height: var(--orb-size);
+    width: calc(var(--orb-size) * var(--orb-scale));
+    height: calc(var(--orb-size) * var(--orb-scale));
     border-radius: 50%;
     background: var(--orb-color);
     translate: -50% -50%;
-    filter: blur(var(--orb-blur));
+    filter: blur(calc(var(--orb-blur) * var(--orb-scale)));
     will-change: transform;
   }
 
