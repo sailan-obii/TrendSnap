@@ -36,6 +36,63 @@
       rgba(0, 0, 0, 0.01) 0 0 0 2px inset;
   }
 
+  .modal-flashy-border {
+    position: relative;
+    isolation: isolate;
+    padding: 1px;
+    border-radius: 1rem;
+    background: linear-gradient(
+      120deg,
+      rgba(100, 255, 218, 0.42) 0%,
+      rgba(99, 102, 241, 0.38) 22%,
+      rgba(192, 38, 211, 0.34) 44%,
+      rgba(255, 107, 107, 0.32) 66%,
+      rgba(251, 191, 36, 0.3) 88%,
+      rgba(100, 255, 218, 0.42) 100%
+    );
+    background-size: 300% 300%;
+    animation: modalBorderFlow 12s ease infinite;
+    box-shadow: 0 0 22px rgba(192, 38, 211, 0.16);
+  }
+
+  .modal-flashy-border::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    z-index: -1;
+    border-radius: 1.18rem;
+    background: inherit;
+    background-size: inherit;
+    filter: blur(8px);
+    opacity: 0.26;
+    animation: modalBorderFlow 12s ease infinite;
+  }
+
+  .modal-flashy-border__inner {
+    position: relative;
+    overflow: hidden;
+    border-radius: calc(1rem - 1px);
+    background-color: var(--bg-elevated);
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.55);
+  }
+
+  @keyframes modalBorderFlow {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .modal-flashy-border,
+    .modal-flashy-border::before {
+      animation: none;
+    }
+  }
+
   .app-main {
     position: relative;
     isolation: isolate;
