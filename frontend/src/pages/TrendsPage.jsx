@@ -44,8 +44,9 @@ export function TrendsPage() {
 
       <main className="px-0 py-6 md:py-8">
         <div className="mb-4 px-4 md:mb-6 md:mx-[30px] md:px-4">
-          <h1 className="text-red-500 text-2xl font-bold md:text-3xl">
-            Retrouvez ici les tendances des plateformes de streaming et de cinéma.
+          <h1 className="text-white text-2xl font-bold md:text-3xl">
+            Retrouvez ici les tendances des 
+            <span className="gradient-text"> plateformes de streaming et de cinéma.</span>
           </h1>
           <p className="text-white/70 mt-2">
             Les tendances sont mises à jour quotidiennement.
