@@ -207,8 +207,18 @@
       background-position: 100% 50%;
     }
   }
+  .gradient-text-violet {
+    background: linear-gradient(120deg, #7c3aed 0%, #c026d3 20%, #e879f9 45%, #9333ea 65%, #7c3aed 85%, #6366f1 100%);
+    background-size: 300% 100%;
+    background-clip: border-box;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradientFlow 8s ease infinite;
+  }
   @media (prefers-reduced-motion: reduce) {
-    .gradient-text {
+    .gradient-text,
+    .gradient-text-violet {
       animation: none;
     }
   }
