@@ -94,8 +94,19 @@
   }
 
   .card-multicolor-border {
-    padding: 1px;
+    position: relative;
+    isolation: isolate;
     border-radius: 0.75rem;
+    box-shadow: 0 0 12px rgba(192, 38, 211, 0.08);
+  }
+
+  .card-multicolor-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    padding: 1px;
     background: linear-gradient(
       var(--card-border-angle, 120deg),
       var(--card-border-c1) 0%,
@@ -103,12 +114,22 @@
       var(--card-border-c3) 67%,
       var(--card-border-c4) 100%
     );
-    box-shadow: 0 0 12px rgba(192, 38, 211, 0.08);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
   }
 
   .card-multicolor-border__inner {
+    position: relative;
+    z-index: 1;
     overflow: hidden;
-    border-radius: calc(0.75rem - 1px);
+    border-radius: inherit;
   }
 
   .app-main {

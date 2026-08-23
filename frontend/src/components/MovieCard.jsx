@@ -2,10 +2,9 @@ import { getCardTemplate } from '../templates/cardTemplates'
 import { RankNumber } from '../templates/RankNumber'
 import { CardMulticolorBorder } from './CardMulticolorBorder'
 
-export function MovieCard({ movie, number, template = 'cinema', cardWidth, cardHeight, onSelect }) {
+export function MovieCard({ movie, number, template = 'cinema', cardWidth, onSelect }) {
   const { config, CardInfo } = getCardTemplate(template)
   const width = cardWidth ?? config.cardWidth
-  const height = cardHeight ?? config.cardHeight
   const aspectClass = config.posterAspect === '16/9' ? 'aspect-video' : 'aspect-[2/3]'
   const showNumber = config.showNumber && number != null
   const rankInsetClass = showNumber
@@ -35,11 +34,11 @@ export function MovieCard({ movie, number, template = 'cinema', cardWidth, cardH
       )}
       <CardMulticolorBorder
         seed={`${movie.title}-${template}`}
-        className={`relative z-10 md:hover:scale-105 transition-transform duration-300 ${rankInsetClass}`}
-        innerClassName="bg-zinc-900 cursor-pointer"
-        innerStyle={{ minHeight: `${height}px` }}
+        className={`z-10 md:hover:scale-105 transition-transform duration-300 ${rankInsetClass}`}
+        innerClassName="bg-zinc-900"
       >
         <div
+          className="relative cursor-pointer"
           onClick={handleSelect}
           onContextMenu={handleContextMenu}
           role="button"
