@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { BackgroundOrbs } from '../../components/BackgroundOrbs'
 import { Header } from '../../components/Header'
 import { MovieModal } from '../../components/MovieModal'
 import { useFavorites } from './useFavorites'
@@ -42,6 +43,7 @@ export function FavoritesPage() {
 
   return (
     <div className="app-main">
+      <BackgroundOrbs />
       <Header />
 
       <main className="px-6 pt-8 pb-16 max-w-7xl mx-auto">

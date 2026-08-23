@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { loadSnapshot } from '../data/loadSnapshots'
+import { BackgroundOrbs } from '../components/BackgroundOrbs'
 import { Header } from '../components/Header'
 import { HeroCarousel } from '../components/HeroCarousel'
 import { PlatformSection } from '../components/PlatformSection'
@@ -40,6 +41,7 @@ export function TrendsPage() {
 
   return (
     <div className="app-main">
+      <BackgroundOrbs />
       <Header />
 
       <main className="px-0 py-6 md:py-8">
